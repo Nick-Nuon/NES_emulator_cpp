@@ -1,0 +1,1 @@
+/usr/bin/g++ -g -rdynamic CMakeFiles/tests.dir/NES_CPU.cpp.o -o tests  -lgtest_main -lgtest 

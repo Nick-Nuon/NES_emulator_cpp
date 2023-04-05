@@ -1,0 +1,1 @@
+/usr/bin/g++ -g -rdynamic CMakeFiles/NES_emulator.dir/main.cpp.o CMakeFiles/NES_emulator.dir/NES_CPU.cpp.o -o NES_emulator 

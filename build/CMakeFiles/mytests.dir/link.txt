@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/mytests.dir/tests.cpp.o CMakeFiles/mytests.dir/NES_CPU.cpp.o CMakeFiles/mytests.dir/main.cpp.o -o mytests  -lgtest 

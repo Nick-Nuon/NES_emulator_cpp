@@ -1,0 +1,1 @@
+/usr/bin/g++ -g -rdynamic CMakeFiles/NES.dir/NES_CPU.cpp.o CMakeFiles/NES.dir/main.cpp.o CMakeFiles/NES.dir/tests.cpp.o -o NES  lib/libgtest_main.a lib/libgtest.a 

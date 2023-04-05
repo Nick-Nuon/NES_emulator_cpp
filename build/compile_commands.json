@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/build",
+  "command": "/usr/bin/g++  -I\"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/googletest/include\" -g -o CMakeFiles/mytests.dir/tests.cpp.o -c \"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/tests.cpp\"",
+  "file": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/tests.cpp",
+  "output": "CMakeFiles/mytests.dir/tests.cpp.o"
+},
+{
+  "directory": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/build",
+  "command": "/usr/bin/g++  -I\"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/googletest/include\" -g -o CMakeFiles/mytests.dir/NES_CPU.cpp.o -c \"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/NES_CPU.cpp\"",
+  "file": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/NES_CPU.cpp",
+  "output": "CMakeFiles/mytests.dir/NES_CPU.cpp.o"
+},
+{
+  "directory": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/build",
+  "command": "/usr/bin/g++  -I\"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/googletest/include\" -g -o CMakeFiles/mytests.dir/main.cpp.o -c \"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/main.cpp\"",
+  "file": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/main.cpp",
+  "output": "CMakeFiles/mytests.dir/main.cpp.o"
+}
+]
