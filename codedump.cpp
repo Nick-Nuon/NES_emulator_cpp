@@ -1,21 +1,18 @@
+#include <algorithm>
 #include <iostream>
+#include <vector>
+#include <ranges>
 
 int main() {
-uint8_t status = 0b0000'0001; // Example status value
-int a = 5;
-int b = 10;
-int c = 3;
-uint8_t carry = 0b0000'0001;
+    std::vector<int> numbers = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 
-int sum1 = a + b + ( status & carry ? 1 : 0);
-/*    ([&]() -> int {
-    if (status & static_cast<uint8_t>(carry)) {
-        return 1;
-    } else {
-        return 0;
+    auto even_numbers = numbers
+                        | std::views::filter([](int n) { return n % 2 == 0; })
+                        | std::views::transform([](int n) { return n * 2; });
+
+    for (int n : even_numbers) {
+        std::cout << n << " ";
     }
-})();*/
 
-std::cout << sum1;
-
+    return 0;
 }

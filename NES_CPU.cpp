@@ -247,6 +247,212 @@ uint16_t stack_pop_u16() {
 
 /**/
 
+void asl_accumulator() {
+    uint8_t data = register_a;
+    if (data >> 7 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data <<= 1;
+    set_register_a(data);
+}
+
+uint8_t asl(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    if (data >> 7 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data <<= 1;
+    mem_write(addr, data);
+    update_zero_and_negative_flags(data);
+    return data;
+}
+
+void lsr_accumulator() {
+    uint8_t data = register_a;
+    if (data & 1 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data >>= 1;
+    set_register_a(data);
+}
+
+uint8_t lsr(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    if (data & 1 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data >>= 1;
+    mem_write(addr, data);
+    update_zero_and_negative_flags(data);
+    return data;
+}
+
+uint8_t rol(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    bool old_carry = has_flag(CpuFlags::Carry);
+
+    if (data >> 7 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data <<= 1;
+    if (old_carry) {
+        data |= 1;
+    }
+    mem_write(addr, data);
+    update_zero_and_negative_flags(data);
+    return data;
+}
+
+void rol_accumulator() {
+    uint8_t data = register_a;
+    bool old_carry = has_flag(CpuFlags::Carry);
+
+    if (data >> 7 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data <<= 1;
+    if (old_carry) {
+        data |= 1;
+    }
+    set_register_a(data);
+}
+
+uint8_t ror(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    bool old_carry = has_flag(CpuFlags::Carry);
+
+    if (data & 1 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data >>= 1;
+    if (old_carry) {
+        data |= 0b10000000;
+    }
+    mem_write(addr, data);
+    update_zero_and_negative_flags(data);
+    return data;
+}
+
+void ror_accumulator() {
+    uint8_t data = register_a;
+    bool old_carry = has_flag(CpuFlags::Carry);
+
+    if (data & 1 == 1) {
+        set_carry_flag();
+    } else {
+        clear_carry_flag();
+    }
+    data >>= 1;
+    if (old_carry) {
+        data |= 0b10000000;
+    }
+    set_register_a(data);
+}
+
+/**/
+
+uint8_t inc(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    data = data + 1;
+    mem_write(addr, data);
+    update_zero_and_negative_flags(data);
+    return data;
+}
+
+void pla() {
+    uint8_t data = stack_pop();
+    set_register_a(data);
+}
+
+void dey() {
+    register_y = register_y - 1;
+    update_zero_and_negative_flags(register_y);
+}
+
+void dex() {
+    register_x = register_x - 1;
+    update_zero_and_negative_flags(register_x);
+}
+
+uint8_t dec(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    data = data - 1;
+    mem_write(addr, data);
+    update_zero_and_negative_flags(data);
+    return data;
+}
+
+void plp() {
+    status = stack_pop();
+    status &= ~static_cast<uint8_t>(CpuFlags::Break);
+    status |= static_cast<uint8_t>(CpuFlags::Break2);
+}
+
+void php() {
+    auto flags = status;
+    flags |= ~static_cast<uint8_t>(CpuFlags::Break);
+    flags |= static_cast<uint8_t>(CpuFlags::Break2);
+    stack_push(flags);
+}
+
+void bit(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    uint8_t result = register_a & data;
+    if (result == 0) {
+        status |= ~static_cast<uint8_t>(CpuFlags::Zero);
+    } else {
+        status &= ~static_cast<uint8_t>(CpuFlags::Zero);
+    }
+
+
+/*-----------------------------------------------*/
+    status.set(CpuFlags::Negative, data & 0b10000000 > 0);
+    status.set(CpuFlags::Overflow, data & 0b01000000 > 0);
+}
+
+void compare(const AddressingMode& mode, uint8_t compare_with) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    if (data <= compare_with) {
+        status.insert(CpuFlags::Carry);
+    } else {
+        status.remove(CpuFlags::Carry);
+    }
+
+    update_zero_and_negative_flags(compare_with - data);
+}
+
+void branch(bool condition) {
+    if (condition) {
+        int8_t jump = static_cast<int8_t>(mem_read(program_counter));
+        uint16_t jump_addr = program_counter + 1 + static_cast<uint16_t>(jump);
+
+        program_counter = jump_addr;
+    }
+}
+
+
     // Other functions need to be implemented accordingly
     // ...
 
