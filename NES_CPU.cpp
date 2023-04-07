@@ -4,8 +4,11 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include <type_traits>
+#pragma once
+
 
 #include <bitset>
+
 
 
 //complains if I put in class CPU
@@ -37,6 +40,10 @@ enum class CpuFlags : uint8_t {
 
 };
 
+void remove_bit(CpuFlags flag){
+
+}
+
     /*// Define bitwise operators for CpuFlags
     constexpr CpuFlags operator|(CpuFlags lhs, CpuFlags rhs) {
         using T = std::underlying_type_t<CpuFlags>;
@@ -60,23 +67,13 @@ enum class CpuFlags : uint8_t {
 
 
 
+
 class CPU {
 public:
 
 
 
-    enum class AddressingMode {
-        Immediate,
-        ZeroPage,
-        ZeroPage_X,
-        ZeroPage_Y,
-        Absolute,
-        Absolute_X,
-        Absolute_Y,
-        Indirect_X,
-        Indirect_Y,
-        NoneAddressing,
-    };
+
 
 
     uint8_t register_a;
@@ -86,6 +83,15 @@ public:
     uint16_t program_counter;
     uint8_t stack_pointer;
     std::array<uint8_t, 0xFFFF> memory;
+
+    void remove_flag(CpuFlags flag){
+        status &= ~static_cast<uint8_t>(flag);
+        std::cout << status;
+    };
+    void add_flag(CpuFlags flag){
+        status |= static_cast<uint8_t>(flag);
+        std::cout << status;
+    };
 
     void reset() {
         register_a = 0;
@@ -410,7 +416,7 @@ void plp() {
 
 void php() {
     auto flags = status;
-    flags |= ~static_cast<uint8_t>(CpuFlags::Break);
+    flags |= static_cast<uint8_t>(CpuFlags::Break);
     flags |= static_cast<uint8_t>(CpuFlags::Break2);
     stack_push(flags);
 }
@@ -420,24 +426,30 @@ void bit(const AddressingMode& mode) {
     uint8_t data = mem_read(addr);
     uint8_t result = register_a & data;
     if (result == 0) {
-        status |= ~static_cast<uint8_t>(CpuFlags::Zero);
+        status |= static_cast<uint8_t>(CpuFlags::Zero);
     } else {
         status &= ~static_cast<uint8_t>(CpuFlags::Zero);
     }
 
 
 /*-----------------------------------------------*/
-    status.set(CpuFlags::Negative, data & 0b10000000 > 0);
-    status.set(CpuFlags::Overflow, data & 0b01000000 > 0);
+    if ((data & 0b10000000) > 0){
+        this->add_flag(CpuFlags::Negative);
+    }
+
+    if ((data & 0b01000000) > 0){
+        this->add_flag(CpuFlags::Negative);
+    }
+
 }
 
 void compare(const AddressingMode& mode, uint8_t compare_with) {
     uint16_t addr = get_operand_address(mode);
     uint8_t data = mem_read(addr);
     if (data <= compare_with) {
-        status.insert(CpuFlags::Carry);
+        this->add_flag(CpuFlags::Carry);
     } else {
-        status.remove(CpuFlags::Carry);
+        this->remove_flag(CpuFlags::Carry);
     }
 
     update_zero_and_negative_flags(compare_with - data);
@@ -446,7 +458,9 @@ void compare(const AddressingMode& mode, uint8_t compare_with) {
 void branch(bool condition) {
     if (condition) {
         int8_t jump = static_cast<int8_t>(mem_read(program_counter));
-        uint16_t jump_addr = program_counter + 1 + static_cast<uint16_t>(jump);
+        uint16_t jump_addr = program_counter 
+                            + 1 
+                            + static_cast<uint16_t>(jump);
 
         program_counter = jump_addr;
     }

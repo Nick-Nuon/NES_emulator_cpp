@@ -19,6 +19,6 @@ FetchContent_Declare(
 include_directories(googletest/include) # this is so we can #include <gtest/gtest.h>
 
 
-add_executable(mytests tests.cpp NES_CPU.cpp main.cpp) # add this executable
+add_executable(mytests tests.cpp NES_CPU.cpp main.cpp NES_opcodes.cpp) # add this executable
 
 target_link_libraries(mytests PRIVATE gtest) # link google test to this executable

@@ -16,5 +16,11 @@
   "command": "/usr/bin/g++  -I\"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/googletest/include\" -g -o CMakeFiles/mytests.dir/main.cpp.o -c \"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/main.cpp\"",
   "file": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/main.cpp",
   "output": "CMakeFiles/mytests.dir/main.cpp.o"
+},
+{
+  "directory": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/build",
+  "command": "/usr/bin/g++  -I\"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/googletest/include\" -g -o CMakeFiles/mytests.dir/NES_opcodes.cpp.o -c \"/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/NES_opcodes.cpp\"",
+  "file": "/home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/NES_opcodes.cpp",
+  "output": "CMakeFiles/mytests.dir/NES_opcodes.cpp.o"
 }
 ]
