@@ -4,10 +4,14 @@
 #include <iostream>
 #include "gtest/gtest.h"
 #include <type_traits>
-#pragma once
 
+#include "NES_opcodes.h"
 
+#include <cstdint>
+#include <unordered_map>
+#include <stdexcept>
 #include <bitset>
+
 
 
 
@@ -15,67 +19,9 @@
 constexpr uint16_t STACK = 0x0100;
 constexpr uint8_t STACK_RESET = 0xfd;
 
-// Status Register (P) http://wiki.nesdev.com/w/index.php/Status_flags
-//
-//  7 6 5 4 3 2 1 0
-//  N V _ B D I Z C
-//  | |   | | | | +--- Carry Flag
-//  | |   | | | +----- Zero Flag
-//  | |   | | +------- Interrupt Disable
-//  | |   | +--------- Decimal Mode (not used on NES)
-//  | |   +----------- Break Command
-//  | +--------------- Overflow Flag
-//  +----------------- Negative Flag
-//
-enum class CpuFlags : uint8_t {
-    Carry             = 0b0000'0001,
-    Zero              = 0b0000'0010,
-    InterruptDisable  = 0b0000'0100,
-    DecimalMode       = 0b0000'1000,
-    Break             = 0b0001'0000,
-    Break2            = 0b0010'0000,
-    Overflow          = 0b0100'0000,
-    Negative          = 0b1000'0000
-
-
-};
-
-void remove_bit(CpuFlags flag){
-
-}
-
-    /*// Define bitwise operators for CpuFlags
-    constexpr CpuFlags operator|(CpuFlags lhs, CpuFlags rhs) {
-        using T = std::underlying_type_t<CpuFlags>;
-        return static_cast<CpuFlags>(static_cast<T>(lhs) | static_cast<T>(rhs));
-    }
-
-    constexpr CpuFlags operator&(CpuFlags lhs, CpuFlags rhs) {
-        using T = std::underlying_type_t<CpuFlags>;
-        return static_cast<CpuFlags>(static_cast<T>(lhs) & static_cast<T>(rhs));
-    }
-
-    constexpr CpuFlags& operator|=(CpuFlags& lhs, CpuFlags rhs) {
-        lhs = lhs | rhs;
-        return lhs;
-    }
-
-    constexpr CpuFlags& operator&=(CpuFlags& lhs, CpuFlags rhs) {
-        lhs = lhs & rhs;
-        return lhs;
-    }*/
-
-
-
 
 class CPU {
 public:
-
-
-
-
-
-
     uint8_t register_a;
     uint8_t register_x;
     uint8_t register_y;
@@ -118,38 +64,6 @@ public:
 
 
 
-    void interpret(const std::vector<uint8_t>& program) {
-        program_counter = 0;
-
-        while (true) {
-            uint8_t opcode = program[program_counter];
-            program_counter++;
-
-            switch (opcode) {
-                case 0xA9: {
-                    uint8_t param = program[program_counter];
-                    program_counter++;
-
-                    lda(param);
-                    break;
-                }
-
-                case 0x00:
-                    return;
-
-                case 0xAA:
-                    tax();
-                    break;
-
-                case 0xE8:
-                    inx();
-                    break;
-
-                default:
-                    assert(false && "Unimplemented opcode");
-            }
-        }
-    }
 
 
 private:
@@ -432,7 +346,6 @@ void bit(const AddressingMode& mode) {
     }
 
 
-/*-----------------------------------------------*/
     if ((data & 0b10000000) > 0){
         this->add_flag(CpuFlags::Negative);
     }
@@ -466,58 +379,529 @@ void branch(bool condition) {
     }
 }
 
+void run() {
+    //const std::unordered_map<uint8_t, OpCode>& opcodes = OpCode::OPCODES_MAP;
+
+    while (true) {
+        uint8_t code = mem_read(program_counter);
+        program_counter += 1;
+        uint16_t program_counter_state = program_counter;
+
+        const OpCode& opcode = opcodes.at(code);
+
+        switch (code) {
+            case 0xa9: case 0xa5: case 0xb5: case 0xad: case 0xbd: case 0xb9: case 0xa1: case 0xb1:
+                lda(opcode.mode);
+                break;
+
+            case 0xAA:
+                tax();
+                break;
+            case 0xe8:
+                inx();
+                break;
+            case 0x00:
+                return;
+
+            // CLD
+            case 0xd8:
+                remove_flag((CpuFlags::DecimalMode));
+                break;
+
+            // CLI
+            case 0x58:
+                remove_flag((CpuFlags::InterruptDisable));
+                break;
+
+            // CLV
+            case 0xb8:
+                remove_flag((CpuFlags::Overflow));
+                break;
+
+            // CLC
+            case 0x18:
+                clear_carry_flag();
+                break;
+
+            // SEC
+            case 0x38:
+                set_carry_flag();
+                break;
+
+            // SEI
+            case 0x78:
+                add_flag(CpuFlags::InterruptDisable);
+                break;
+
+            // SED
+            case 0xf8:
+                add_flag(CpuFlags::DecimalMode);
+                break;
+
+            // PHA
+            case 0x48:
+                stack_push(register_a);
+                break;
+
+            // PLA
+            case 0x68:
+                pla();
+                break;
+
+            // PHP
+            case 0x08:
+                php();
+                break;
+
+            // PLP
+            case 0x28:
+                plp();
+                break;
+
+            // ADC
+            case 0x69: case 0x65: case 0x75: case 0x6d: case 0x7d: case 0x79: case 0x61: case 0x71:
+                adc(opcode.mode);
+                break;
+
+            // SBC
+            case 0xe9: case 0xe5: case 0xf5: case 0xed: case 0xfd: case 0xf9: case 0xe1: case 0xf1:
+                sbc(opcode.mode);
+                break;
+
+            // AND
+            case 0x29: case 0x25: case 0x35: case 0x2d: case 0x3d: case 0x39: case 0x21: case 0x31:
+                and_op(opcode.mode);
+                break;
+
+            // EOR
+            case 0x49: case 0x45: case 0x55: case 0x4d: case 0x5d: case 0x59: case 0x41: case 0x51:
+            eor(opcode.mode);
+            break;
+
+                    // ORA
+        case 0x09: case 0x05: case 0x15: case 0x0d: case 0x1d: case 0x19: case 0x01: case 0x11:
+            ora(opcode.mode);
+            break;
+
+        // LSR
+        case 0x4a:
+            lsr_accumulator();
+            break;
+
+        // LSR
+        case 0x46: case 0x56: case 0x4e: case 0x5e:
+            lsr(opcode.mode);
+            break;
+
+        // ASL
+        case 0x0a:
+            asl_accumulator();
+            break;
+
+        // ASL
+        case 0x06: case 0x16: case 0x0e: case 0x1e:
+            asl(opcode.mode);
+            break;
+
+        // ROL
+        case 0x2a:
+            rol_accumulator();
+            break;
+
+        // ROL
+        case 0x26: case 0x36: case 0x2e: case 0x3e:
+            rol(opcode.mode);
+            break;
+
+        // ROR
+        case 0x6a:
+            ror_accumulator();
+            break;
+
+        // ROR
+        case 0x66: case 0x76: case 0x6e: case 0x7e:
+            ror(opcode.mode);
+            break;
+
+        // INC
+        case 0xe6: case 0xf6: case 0xee: case 0xfe:
+            inc(opcode.mode);
+            break;
+
+        // INY
+        case 0xc8:
+            iny();
+            break;
+
+        // DEC
+        case 0xc6: case 0xd6: case 0xce: case 0xde:
+            dec(opcode.mode);
+            break;
+
+        // DEX
+        case 0xca:
+            dex();
+            break;
+
+        // DEY
+        case 0x88:
+            dey();
+            break;
+
+        // CMP
+        case 0xc9: case 0xc5: case 0xd5: case 0xcd: case 0xdd: case 0xd9: case 0xc1: case 0xd1:
+            compare(opcode.mode, register_a);
+            break;
+
+        // CPY
+        case 0xc0: case 0xc4: case 0xcc:
+            compare(opcode.mode, register_y);
+            break;
+
+        // CPX
+        case 0xe0: case 0xe4: case 0xec:
+            compare(opcode.mode, register_x);
+            break;
+
+        // JMP Absolute
+        case 0x4c:
+            {
+                uint16_t mem_address = mem_read_u16(program_counter);
+                program_counter = mem_address;
+            }
+            break;
+
+            // JMP Indirect
+            case 0x6c: {
+                uint16_t mem_address = mem_read_u16(program_counter);
+                uint16_t indirect_ref;
+
+                if ((mem_address & 0x00FF) == 0x00FF) {
+                    uint8_t lo = mem_read(mem_address);
+                    uint8_t hi = mem_read(mem_address & 0xFF00);
+                    indirect_ref = (static_cast<uint16_t>(hi) << 8) | static_cast<uint16_t>(lo);
+                } else {
+                    indirect_ref = mem_read_u16(mem_address);
+                }
+
+                program_counter = indirect_ref;
+                break;
+            }
+
+            // JSR
+            case 0x20: {
+                stack_push_u16(program_counter + 2 - 1);
+                uint16_t target_address = mem_read_u16(program_counter);
+                program_counter = target_address;
+                break;
+            }
+
+            // RTS
+            case 0x60: {
+                program_counter = stack_pop_u16() + 1;
+                break;
+            }
+
+            // RTI
+            case 0x40: {
+                status = stack_pop();
+                remove_flag(CpuFlags::Break);
+                add_flag(CpuFlags::Break2);
+                program_counter = stack_pop_u16();
+                break;
+            }
+
+            // BNE
+            case 0xd0: {
+                branch(~has_flag(CpuFlags::Zero));
+                break;
+            }
+
+            // BVS
+            case 0x70: {
+                branch(has_flag(CpuFlags::Overflow));
+                break;
+            }
+
+            // BVC
+            case 0x50: {
+                branch(!has_flag(CpuFlags::Overflow));
+                break;
+            }
+
+            // BPL
+            case 0x10: {
+                branch(!has_flag(CpuFlags::Negative));
+                break;
+            }
+
+            // BMI
+            case 0x30: {
+                branch(has_flag(CpuFlags::Negative));
+                break;
+            }
+
+            // BEQ
+            case 0xf0: {
+                branch(has_flag(CpuFlags::Zero));
+                break;
+            }
+
+            // BCS
+            case 0xb0: {
+                branch(has_flag(CpuFlags::Carry));
+                break;
+            }
+
+            // BCC
+            case 0x90: {
+                branch(!has_flag(CpuFlags::Carry));
+                break;
+            }
+
+            // BIT
+            case 0x24: case 0x2c: {
+                bit(opcode.mode);
+                break;
+            }
+
+            // STA
+            case 0x85: case 0x95: case 0x8d: case 0x9d: case 0x99: case 0x81: case 0x91: {
+                sta(opcode.mode);
+                break;
+            }
+
+            // STX
+            case 0x86: case 0x96: case 0x8e: {
+                uint16_t addr = get_operand_address(opcode.mode);
+                mem_write(addr, register_x);
+                break;
+            }
+
+            // STY
+            case 0x84: case 0x94: case 0x8c: {
+                uint16_t addr = get_operand_address(opcode.mode);
+                mem_write(addr, register_y);
+                break;
+            }
+
+            // LDX
+            case 0xa2: case 0xa6: case 0xb6: case 0xae: case 0xbe: {
+                ldx(opcode.mode);
+                break;
+            }
+
+            // LDY
+            case 0xa0: case 0xa4: case 0xb4: case 0xac: case 0xbc: {
+                ldy(opcode.mode);
+                break;
+            }
+
+            // NOP
+            case 0xea: {
+                // do nothing
+                break;
+            }
+
+            // TAY
+            case 0xa8: {
+                register_y = register_a;
+                update_zero_and_negative_flags(register_y);
+                break;
+            }
+
+            // TSX
+            case 0xba: {
+                register_x = stack_pointer;
+                update_zero_and_negative_flags(register_x);
+                break;
+            }
+
+            // TXA
+            case 0x8a: {
+                register_a = register_x;
+                update_zero_and_negative_flags(register_a);
+                break;
+            }
+
+            // TXS
+            case 0x9a: {
+                stack_pointer = register_x;
+                break;
+            }
+
+            // TYA
+            case 0x98: {
+                register_a = register_y;
+                update_zero_and_negative_flags(register_a);
+                break;
+            }
+
+            default: {
+                // TODO: handle unknown opcodes
+                break;
+            }
+        }
+
+        if (program_counter_state == program_counter) {
+            program_counter += (opcode.len - 1);
+        }
+    }
+}
+
+
+// ...
+
+uint16_t get_operand_address(AddressingMode mode) {
+    switch (mode) {
+        case AddressingMode::Immediate:
+            return program_counter;
+
+        case AddressingMode::ZeroPage:
+            return static_cast<uint16_t>(mem_read(program_counter));
+
+        case AddressingMode::Absolute:
+            return mem_read_u16(program_counter);
+
+        case AddressingMode::ZeroPage_X: {
+            uint8_t pos = mem_read(program_counter);
+            uint16_t addr = (pos + register_x) ;// %256;
+            return addr;
+        }
+        case AddressingMode::ZeroPage_Y: {
+            uint8_t pos = mem_read(program_counter);
+            uint16_t addr = (pos + register_y) ;// %256;
+            return addr;
+        }
+
+        case AddressingMode::Absolute_X: {
+            uint16_t base = mem_read_u16(program_counter);
+            uint16_t addr = base + register_x;
+            return addr;
+        }
+        case AddressingMode::Absolute_Y: {
+            uint16_t base = mem_read_u16(program_counter);
+            uint16_t addr = base + register_y;
+            return addr;
+        }
+
+        case AddressingMode::Indirect_X: {
+            uint8_t base = mem_read(program_counter);
+            uint8_t ptr = (base + register_x) ;// %256;
+            uint8_t lo = mem_read(ptr);
+            uint8_t hi = mem_read((ptr + 1)) ;// %256);
+            return (static_cast<uint16_t>(hi) << 8) | lo;
+        }
+        case AddressingMode::Indirect_Y: {
+            uint8_t base = mem_read(program_counter);
+            uint8_t lo = mem_read(base);
+            uint8_t hi = mem_read((base + 1)) ;// %256);
+            uint16_t deref_base = (static_cast<uint16_t>(hi) << 8) | lo;
+            uint16_t deref = deref_base + register_y;
+            return deref;
+        }
+
+        case AddressingMode::NoneAddressing:
+        default:
+            throw std::runtime_error("Unsupported addressing mode");
+    }
+}
+
+
+
+
+
 
     // Other functions need to be implemented accordingly
     // ...
 
-    bool has_flag(CpuFlags flag) const {
-        return static_cast<bool>(status & flag);
+    bool has_flag(CpuFlags flag) {
+        return (status & static_cast<uint8_t>(flag)) != 0;
     }
 
-    void set_register_a(uint8_t value) {
-        register_a = value;
-        update_zero_and_negative_flags(register_a);
+
+
+// ...
+
+void lda(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t value = mem_read(addr);
+
+    register_a = value;
+    update_zero_and_negative_flags(register_a);
+}
+
+void ldy(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    register_y = data;
+    update_zero_and_negative_flags(register_y);
+}
+
+void ldx(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    register_x = data;
+    update_zero_and_negative_flags(register_x);
+}
+
+void sta(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    mem_write(addr, register_a);
+}
+
+void set_register_a(uint8_t value) {
+    register_a = value;
+    update_zero_and_negative_flags(register_a);
+}
+
+void and_op(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    set_register_a(data & register_a);
+}
+
+void eor(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    set_register_a(data ^ register_a);
+}
+
+void ora(const AddressingMode& mode) {
+    uint16_t addr = get_operand_address(mode);
+    uint8_t data = mem_read(addr);
+    set_register_a(data | register_a);
+}
+
+void tax() {
+    register_x = register_a;
+    update_zero_and_negative_flags(register_x);
+}
+
+void inx() {
+    register_x = (register_x + 1) ;//% 256;
+    update_zero_and_negative_flags(register_x);
+}
+
+void iny() {
+    register_y = (register_y + 1); //% 256;
+    update_zero_and_negative_flags(register_y);
+}
+
+void update_zero_and_negative_flags(uint8_t result) {
+    if (result == 0) {
+        add_flag(CpuFlags::Zero);
+    } else {
+        remove_flag(CpuFlags::Zero);
     }
 
-    //load into register A
-    void lda(uint8_t value) {
-        //loads utf-8 value into "A" or accumulator register
-        register_a = value;
-        update_zero_and_negative_flags(register_a);
+    if (result & 0b1000'0000) {
+        add_flag(CpuFlags::Negative);
+    } else {
+        remove_flag(CpuFlags::Negative);
     }
+}
 
-    void tax() {
-        //loads value in A into X
-        register_x = register_a;
-        update_zero_and_negative_flags(register_x);
-    }
-
-    void inx() {
-        register_x = static_cast<uint8_t>(register_x + 1);
-        update_zero_and_negative_flags(register_x);
-    }
-
-    
-    void update_zero_and_negative_flags(uint8_t result) {
-        if (result == 0) {
-            //sets the ZERO flag to zero
-            // |= denotes OR bitwise operation
-            status |= 0b0000'0010;
-        } else {
-            //sets it to 1
-            //&= denotes AND bitwise operation
-            status &= 0b1111'1101;
-        }
-
-        //if the first bit of result is 1
-        if (result & 0b1000'0000) {
-            //set the negative flag to 1
-            status |= 0b1000'0000;
-        } else {
-            //set the negative flag to 0
-            status &= 0b0111'1111;
-        }
-    }
 };
 
 

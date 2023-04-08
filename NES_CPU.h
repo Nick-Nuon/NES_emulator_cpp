@@ -18,6 +18,7 @@ private:
     void tax();
     void inx();
     void update_zero_and_negative_flags(uint8_t result);
+    void run();
 };
 
 #endif // NES_CPU_HPP

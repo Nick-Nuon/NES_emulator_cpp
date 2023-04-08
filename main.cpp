@@ -1,5 +1,6 @@
 #include <iostream>
 #include "gtest/gtest.h"
+#pragma once
 
 
 //int main(int, char**) {

@@ -273,4 +273,5 @@ CMakeFiles/mytests.dir/tests.cpp.o: \
  /usr/local/include/gtest/gtest_pred_impl.h \
  /usr/local/include/gtest/gtest_prod.h \
  /home/flackjacket/Desktop/Working\ Folder/NES_emulator_cpp/NES_CPU.cpp \
+ /home/flackjacket/Desktop/Working\ Folder/NES_emulator_cpp/NES_opcodes.h \
  /usr/include/c++/11/bitset

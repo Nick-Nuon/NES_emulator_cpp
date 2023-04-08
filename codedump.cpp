@@ -34,16 +34,9 @@ public:
     };
 };
 
-/*
+
 int main() {
-  CPU cpu;
-  // Set the Carry and Zero flags in the status register
-  //cpu.status = static_cast<uint8_t>(CpuFlags::Carry) |
-   //            static_cast<uint8_t>(CpuFlags::Zero);
-  // Call the remove_bit method to clear the Carry flag
-  cpu.add_flag(CpuFlags::Zero);
-  // Print the status register to the console
-  std::cout << std::bitset<8>(cpu.status) << std::endl;
-  // Expected output: 00000010
+
+
   return 0;
-}*/
+}
