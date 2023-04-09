@@ -55,7 +55,6 @@ public:
 
     void load(const std::vector<uint8_t>& program) {
         std::copy(program.begin(), program.end(), memory.begin() + 0x8000);
-        std::cout << memory;
         mem_write_u16(0xFFFC, 0x8000);
     }
 

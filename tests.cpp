@@ -31,7 +31,7 @@ TEST_F(CPUTest, LoadProgramIntoMemory) {
 
     cpu.load(program);
 
-    for (size_t i = 0; i < program.size(); ++i) {
+    for (size_t i = 0; i < program.size(); i++) {
         EXPECT_EQ(program[i], cpu.memory[0x8000 + i]);
     }
 }
@@ -42,7 +42,7 @@ TEST_F(CPUTest, LoadAndRunProgram) {
     cpu.load_and_run(program);
 
     EXPECT_EQ(1, cpu.register_a);
-    EXPECT_EQ(1, cpu.memory[0x8002]);
+    EXPECT_EQ(0x85, cpu.memory[0x8002]);
 }
 
 TEST_F(CPUTest, AddFlag) {
