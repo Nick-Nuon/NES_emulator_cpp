@@ -21,7 +21,11 @@ constexpr uint8_t STACK_RESET = 0xfd;
 
 
 class CPU {
+
+
 public:
+    friend class CPUTest;
+
     uint8_t register_a;
     uint8_t register_x;
     uint8_t register_y;
@@ -51,6 +55,7 @@ public:
 
     void load(const std::vector<uint8_t>& program) {
         std::copy(program.begin(), program.end(), memory.begin() + 0x8000);
+        std::cout << memory;
         mem_write_u16(0xFFFC, 0x8000);
     }
 
@@ -901,6 +906,9 @@ void update_zero_and_negative_flags(uint8_t result) {
         remove_flag(CpuFlags::Negative);
     }
 }
+
+
+
 
 };
 

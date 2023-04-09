@@ -173,30 +173,6 @@ NES_CPU.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/mytests.dir/build.make CMakeFiles/mytests.dir/NES_CPU.cpp.s
 .PHONY : NES_CPU.cpp.s
 
-NES_opcodes.o: NES_opcodes.cpp.o
-.PHONY : NES_opcodes.o
-
-# target to build an object file
-NES_opcodes.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mytests.dir/build.make CMakeFiles/mytests.dir/NES_opcodes.cpp.o
-.PHONY : NES_opcodes.cpp.o
-
-NES_opcodes.i: NES_opcodes.cpp.i
-.PHONY : NES_opcodes.i
-
-# target to preprocess a source file
-NES_opcodes.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mytests.dir/build.make CMakeFiles/mytests.dir/NES_opcodes.cpp.i
-.PHONY : NES_opcodes.cpp.i
-
-NES_opcodes.s: NES_opcodes.cpp.s
-.PHONY : NES_opcodes.s
-
-# target to generate assembly for a file
-NES_opcodes.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/mytests.dir/build.make CMakeFiles/mytests.dir/NES_opcodes.cpp.s
-.PHONY : NES_opcodes.cpp.s
-
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -259,9 +235,6 @@ help:
 	@echo "... NES_CPU.o"
 	@echo "... NES_CPU.i"
 	@echo "... NES_CPU.s"
-	@echo "... NES_opcodes.o"
-	@echo "... NES_opcodes.i"
-	@echo "... NES_opcodes.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

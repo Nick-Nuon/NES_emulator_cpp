@@ -64,8 +64,7 @@
 			[
 				0,
 				1,
-				2,
-				3
+				2
 			]
 		}
 	],
@@ -105,7 +104,13 @@
 			[
 				0,
 				1,
-				2,
+				2
+			]
+		},
+		{
+			"name" : "Header Files",
+			"sourceIndexes" : 
+			[
 				3
 			]
 		}
@@ -132,9 +137,8 @@
 		},
 		{
 			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "NES_opcodes.cpp",
-			"sourceGroupIndex" : 0
+			"path" : "NES_opcodes.h",
+			"sourceGroupIndex" : 1
 		}
 	],
 	"type" : "EXECUTABLE"

@@ -341,9 +341,6 @@ CMakeFiles/mytests.dir/NES_CPU.cpp.o: /home/flackjacket/Desktop/Working\ Folder/
   /home/flackjacket/Desktop/Working\ Folder/NES_emulator_cpp/NES_opcodes.h \
   /usr/include/c++/11/bitset
 
-CMakeFiles/mytests.dir/NES_opcodes.cpp.o: /home/flackjacket/Desktop/Working\ Folder/NES_emulator_cpp/NES_opcodes.cpp \
-  /usr/include/stdc-predef.h
-
 CMakeFiles/mytests.dir/main.cpp.o: /home/flackjacket/Desktop/Working\ Folder/NES_emulator_cpp/main.cpp \
   /usr/include/stdc-predef.h \
   /usr/include/c++/11/iostream \
@@ -1131,8 +1128,6 @@ CMakeFiles/mytests.dir/tests.cpp.o: /home/flackjacket/Desktop/Working\ Folder/NE
 /usr/local/include/gtest/internal/gtest-port-arch.h:
 
 /usr/local/include/gtest/internal/custom/gtest-port.h:
-
-/home/flackjacket/Desktop/Working\ Folder/NES_emulator_cpp/NES_opcodes.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_statx.h:
 

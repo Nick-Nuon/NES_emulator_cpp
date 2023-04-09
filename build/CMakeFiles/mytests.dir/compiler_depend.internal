@@ -342,10 +342,6 @@ CMakeFiles/mytests.dir/NES_CPU.cpp.o
  /home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/NES_opcodes.h
  /usr/include/c++/11/bitset
 
-CMakeFiles/mytests.dir/NES_opcodes.cpp.o
- /home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/NES_opcodes.cpp
- /usr/include/stdc-predef.h
-
 CMakeFiles/mytests.dir/main.cpp.o
  /home/flackjacket/Desktop/Working Folder/NES_emulator_cpp/main.cpp
  /usr/include/stdc-predef.h
